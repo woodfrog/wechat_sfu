@@ -1,18 +1,18 @@
 <?php 
 
 	// database login information
-	define("DB_HOST", "115.28.188.144");
-	define("DB_USER", "root");
+	define("DB_HOST", "120.27.121.163");
+	define("DB_USER", "song");
 	define("DB_PWD", "password");
-	define("DB_NAME", "wechat_sfu");
+	define("DB_NAME", "sfu_schedule");
 
 	define("CUR_YEAR", "2016");
 	define("CUR_SEASON", "Fall");
 	//echo update_course_info(1);
 	
 	define("MIN_ACCESS_TOKEN_LIFE", 200);
-	define("APPID", "wx74ba47e83501fda6");
-	define("APPSECRET", "9921c0b100dc9a490f5964d79da36042");
+	define("APPID", "wx8d9be68032781929");
+	define("APPSECRET", "53543c1143ee6c53f44cf818e44692b1");
 	define("ACCESS_TOKEN_FILE", "/var/www/access_token");
 	//get_access_token();
 	
