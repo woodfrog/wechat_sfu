@@ -1,25 +1,22 @@
 <?php 
 
 	// database login information
-	define("DB_HOST", "120.27.121.163");
-	define("DB_USER", "song");
+	define("DB_HOST", "115.28.188.144");
+	define("DB_USER", "root");
 	define("DB_PWD", "password");
-	define("DB_NAME", "sfu_schedule");
+	define("DB_NAME", "wechat_sfu");
 
 	define("CUR_YEAR", "2016");
 	define("CUR_SEASON", "Fall");
 	//echo update_course_info(1);
 	
 	define("MIN_ACCESS_TOKEN_LIFE", 200);
-	define("APPID", "wx8d9be68032781929");
-	define("APPSECRET", "53543c1143ee6c53f44cf818e44692b1");
+	define("APPID", "wx74ba47e83501fda6");
+	define("APPSECRET", "9921c0b100dc9a490f5964d79da36042");
 	define("ACCESS_TOKEN_FILE", "/var/www/access_token");
 	//get_access_token();
 	
 	function get_schedule($uid, $date) {
-		if ($uid == -1) {
-			return "你还没有注册";
-		}
 		$dayMask = (intval(getdate($date)["wday"], 10) + 6) % 7;
 		$dayMask = pow(2, $dayMask);
 		$date = sprintf("%d-%02d-%02d", getdate($date)["year"], getdate($date)["mon"], getdate($date)["mday"]);
@@ -99,7 +96,6 @@
 		if (!$conn) { // fail to connect to the database
 			return "无法连接到数据库";
 		}
-		mysql_set_charset("utf8", $conn);
 		mysql_select_db(DB_NAME, $conn); // switch to the specific database
 		$sql = "SELECT username FROM users WHERE openid = \"{$openid}\";";
 		$result = mysql_query($sql, $conn);
@@ -126,7 +122,6 @@
 		if (!$conn) { // fail to connect to the database
 			return "无法连接到数据库";
 		}
-		mysql_set_charset("utf8", $conn);
 		mysql_select_db(DB_NAME, $conn); // switch to the specific database
 		$sql = "DELETE FROM users WHERE openid = \"{$openid}\";";
 		mysql_query($sql, $conn);
@@ -137,6 +132,49 @@
 		} else {
 			return "注销成功";
 		}
+	}
+
+	function cancel_reminder($openid) {
+		$uid = get_uid($openid);
+		$conn = mysql_connect(DB_HOST, DB_USER, DB_PWD);
+		if (!$conn) {
+			return "无法连接到数据库";
+		}
+		mysql_select_db(DB_NAME, $conn);
+		$sql = "INSERT INTO no_reminder_users(openid, uid) VALUES(\"{$openid}\", {$uid});";
+		if (mysql_query($sql) == false) { // insertion fails
+			$err_no = mysql_errno();
+			if ($err_no == "1062") { 
+				return "课程提醒已经处于关闭状态";
+			}
+			else{
+				$err_msg = mysql_error();
+				mysql_close($conn);
+				return $err_msg;	
+			}
+			
+		} else {
+			mysql_close($conn);
+			return "已取消课程提醒";
+		}
+	}
+
+	function add_reminder($openid){
+		$conn = mysql_connect(DB_HOST, DB_USER, DB_PWD);
+		if (!$conn){
+			return "无法连接到数据库";
+		}
+		mysql_select_db(DB_NAME, $conn);
+		$sql = "DELETE FROM no_reminder_users WHERE openid = \"{$openid}\";";
+		mysql_query($sql, $conn);
+		if (mysql_affected_rows() == 0){
+			$msg = "课程提醒已经处于开启状态";
+		}
+		else{
+			$msg = "课程提醒开启成功";
+		}
+		mysql_close($conn);
+		return $msg;
 	}
 	
 	function register($openid, $keyType, $key = "") {
@@ -306,7 +344,7 @@
 			return -1;
 		} else if (mysql_num_rows($result) != 1) {
 			mysql_close($conn); // close the connection to the database
-			return -1; 
+			return 1; // the test account
 		} else {
 			$row = mysql_fetch_row($result);
 			$uid = $row[0];
@@ -581,7 +619,7 @@
 			if (isset($package["access_token"])) {
 				$fp = fopen(ACCESS_TOKEN_FILE, "w");
 				fprintf($fp, "%s %d", $package["access_token"], $package["expires_in"] + time());
-				fclose($fp);
+				fclose($fp); 
 				return $package["access_token"];
 			} else {
 				// error occurs

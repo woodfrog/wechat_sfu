@@ -25,8 +25,10 @@
 				"AND (((start_time)%100)+floor(start_time/100)*60) - {$now} <= {$minutes} " . 
 				"AND start_date <= \"{$date}\" " .
 				"AND end_date >= \"{$date}\" " .
-				"AND day&{$dayMask} " . 
+				"AND day&{$dayMask} " .
+				"AND uid NOT IN (SELECT uid FROM no_reminder_users) " . 
 				"ORDER BY start_time;";
+		echo $sql;
 		$result = mysql_query($sql, $conn);
 		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$courseInfo = array("countDown" => "{$row["difference"]}分钟",
