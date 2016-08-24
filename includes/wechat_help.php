@@ -150,7 +150,7 @@
 			else{
 				$err_msg = mysql_error();
 				mysql_close($conn);
-				return $err_msg;	
+				return "数据库错误".$err_msg;	
 			}
 			
 		} else {

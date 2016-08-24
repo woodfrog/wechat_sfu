@@ -168,6 +168,14 @@ class wechatCallbackapiTest
 										$contentStr = get_schedule(get_uid($fromUsername), 1474020000);
 										break;
 									}
+									case "REMINDER_ON": {
+										$contentStr = add_reminder($fromUsername);
+										break;
+									}
+									case "REMINDER_OFF": {
+										$contentStr = cancel_reminder($fromUsername);
+										break;
+									}
 									default: {
 										$contentStr = DEFAULT_MSG;
 									}
