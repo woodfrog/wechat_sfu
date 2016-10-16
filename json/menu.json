@@ -33,5 +33,19 @@
                "name":"周五",
                "key":"FRI_SCHEDULE"
             }]
-       }]
+      },
+      {
+          "name":"课程提醒",
+          "sub_button":[
+           {
+              "type":"click",
+              "name":"开启",
+              "key":"REMINDER_ON"
+           },
+           {
+              "type":"click",
+              "name":"关闭",
+              "key":"REMINDER_OFF"
+           }]
+      }]
 }
